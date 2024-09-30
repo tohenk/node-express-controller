@@ -1,0 +1,27 @@
+{
+  "name": "@ntlab/express-controller",
+  "version": "1.0.0",
+  "description": "Nodejs Express controller",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tohenk/node-express-controller.git"
+  },
+  "keywords": [
+    "express",
+    "controller"
+  ],
+  "author": "Toha <tohenk@yahoo.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tohenk/node-express-controller/issues"
+  },
+  "homepage": "https://github.com/tohenk/node-express-controller#readme",
+  "dependencies": {
+    "@ntlab/ntlib": "^2.1.3",
+    "express": "^4.21.0"
+  }
+}

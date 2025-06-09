@@ -285,9 +285,31 @@ class Controller {
         }
         let res;
         const response = this.app.get('response');
-        response._render(view, options, (err, html) => {
-            res = err ? err : html;
-        });
+        // allows to render view synchronously
+        const expressView = this.app.get('view');
+        if (expressView.prototype.oldrender === undefined) {
+            expressView.prototype.oldrender = expressView.prototype.render;
+            expressView.prototype.renderSync = function(options, callback) {
+                this.engine(this.path, options, callback);
+            }
+            expressView.prototype.render = function(options, callback) {
+                if (!this.syncrender) {
+                    this.oldrender(options, callback);
+                } else {
+                    this.renderSync(options, callback);
+                }
+            }
+        }
+        expressView.prototype.syncrender = true;
+        try {
+            response._render(view, options, (err, html) => {
+                res = err ? err : html;
+            });
+        }
+        catch (e) {
+            console.error(e);
+        }
+        expressView.prototype.syncrender = false;
         return res;
     }
 

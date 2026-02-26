@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2024-2025 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2024-2026 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -44,29 +44,11 @@ const Translator = require('./translator');
  * ```
  *
  * @callback preRouteCallback
- * @param {object} req Request object
- * @param {object} res Response object
- * @param {functionCallback} next Next callback
+ * @param {express.Request} req Request object
+ * @param {express.Response} res Response object
+ * @param {express.NextFunction} next Next callback
  * @param {string} route Route name
  * @returns {void}
- */
-
-/**
- * A route handler.
- *
- * Example:
- *
- * ```
- * function route(req, res, next)) {
- *     // do something
- * }
- * ```
- *
- * @callback routeHandler
- * @param {object} req Request object
- * @param {object} res Response object
- * @param {functionCallback} next Next callback
- * @returns {any}
  */
 
 /**
@@ -88,32 +70,53 @@ const Translator = require('./translator');
  */
 
 /**
+ * @typedef {Object} ControllerRoute
+ * @property {string[]|string} method Request methods
+ * @property {string} path Relative path to root
+ * @property {express.RequestParamHandler} handler Route handler
+ */
+
+/**
+ * @typedef {Object} ControllerOptions
+ * @property {string} name Controller name
+ * @property {string} prefix Path prefix
+ * @property {express.Application} app Express app
+ * @property {{[key: string]: ControllerRoute}} routes Routes
+ * @property {preRouteCallback} preRoute Pre route callback
+ */
+
+/**
  * A controller for Expressjs app.
  *
  * @author Toha <tohenk@yahoo.com>
  */
 class Controller {
 
+    /** @type {{[key: string]: ControllerRoute}} */
     routes = {}
+    /** @type {Controller[]} */
     parents = []
 
     /**
      * Constructor.
      *
-     * @param {object} options Options
-     * @param {string} options.name Controller name
-     * @param {string} options.prefix Path prefix
-     * @param {express} options.app Express app
-     * @param {object} options.routes Routes
-     * @param {preRouteCallback} options.preRoute Pre route callback
+     * @param {ControllerOptions} options Options
      */
     constructor(options) {
+        /** @type {ControllerOptions} */
         this.options = options || {};
+        /** @type {string} */
         this.prefix = options.prefix;
         if (options.app) {
+            /** @type {express.Application} */
             this.app = options.app;
         }
+        /** @type {express.Router} */
         this.router = express.Router();
+        /** @type {Controller} */
+        this.parent;
+        /** @type {string|number} */
+        this.pid;
         this.initialize();
     }
 
@@ -133,7 +136,7 @@ class Controller {
      * @returns {Controller}
      */
     addParent(parent) {
-        if (this.parents.indexOf(parent) < 0) {
+        if (!this.parents.includes(parent)) {
             this.parents.push(parent);
         }
         return this;
@@ -166,7 +169,7 @@ class Controller {
             if (this.app) {
                 const instance = controller(this.app);
                 instance.addParent(this);
-                if (Controller.subControllers.indexOf(instance) < 0) {
+                if (!Controller.subControllers.includes(instance)) {
                     Controller.subControllers.push(instance);
                 }
             }
@@ -223,16 +226,16 @@ class Controller {
      * @param {string} name Route name
      * @param {string|string[]} method Route methods
      * @param {string} path Route path 
-     * @param {routeHandler} handler Route handler
+     * @param {express.RequestParamHandler} handler Route handler
      */
     addRoute(name, method, path, handler) {
-        this.routes[name] = {method: method, path: path, handler: handler};
+        this.routes[name] = {method, path, handler};
     }
 
     /**
      * Add routes.
      *
-     * @param {object} routes Routes collection
+     * @param {{[key: string]: ControllerRoute}} routes Routes collection
      */
     addRoutes(routes) {
         Object.keys(routes).forEach(route => {
@@ -256,7 +259,7 @@ class Controller {
                     if (typeof this.options.preRoute === 'function') {
                         await this.options.preRoute(req, res, next, route);
                     }
-                    data.handler(req, res, next);
+                    await data.handler(req, res, next);
                 });
             });
         });
@@ -275,8 +278,8 @@ class Controller {
     /**
      * Render a view.
      *
-     * @param {string} view 
-     * @param {object} options 
+     * @param {string} view View name
+     * @param {object} options Options
      * @returns {string}
      */
     renderView(view, options = {}) {
@@ -341,7 +344,7 @@ class Controller {
      * Set controller.
      *
      * @param {string} name Controller name
-     * @param {Controller} controller Controller instance 
+     * @param {Controller} controller Controller instance
      */
     static set(name, controller) {
         if (name === undefined) {
@@ -359,7 +362,7 @@ class Controller {
     /**
      * Get all controllers.
      *
-     * @returns {object}
+     * @returns {{[key: string]: Controller}}
      */
     static get controllers() {
         if (Controller._controllers === undefined) {

@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2024-2025 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2024-2026 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -30,6 +30,7 @@ const util = require('@ntlab/ntlib/util');
  * @author Toha <tohenk@yahoo.com>
  */
 class Translator {
+
     static _(message, params = {}) {
         if (typeof this.translate === 'function') {
             return this.translate(message, params);

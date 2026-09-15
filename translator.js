@@ -22,21 +22,4 @@
  * SOFTWARE.
  */
 
-const util = require('@ntlab/ntlib/util');
-
-/**
- * A message translator.
- *
- * @author Toha <tohenk@yahoo.com>
- */
-class Translator {
-
-    static _(message, params = {}) {
-        if (typeof this.translate === 'function') {
-            return this.translate(message, params);
-        }
-        return util.trans(message, params);
-    }
-}
-
-module.exports = Translator;
+module.exports = require('@ntlab/ntlib/translator');

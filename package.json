@@ -1,6 +1,6 @@
 {
   "name": "@ntlab/express-controller",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Nodejs Express controller",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/tohenk/node-express-controller#readme",
   "dependencies": {
-    "@ntlab/ntlib": "^3.0.0",
+    "@ntlab/ntlib": "^3.1.2",
     "express": "^5.2.1"
   }
 }

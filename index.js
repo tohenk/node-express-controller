@@ -25,10 +25,11 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const Translator = require('./translator');
+const _ = require('./translator');
 
 /**
- * @callback functionCallback
+ * @callback ControllerCallback
+ * @param {express.Application} app Express application
  * @returns {void}
  */
 
@@ -43,7 +44,7 @@ const Translator = require('./translator');
  * }
  * ```
  *
- * @callback preRouteCallback
+ * @callback PreRouteCallback
  * @param {express.Request} req Request object
  * @param {express.Response} res Response object
  * @param {express.NextFunction} next Next callback
@@ -63,8 +64,8 @@ const Translator = require('./translator');
  * }
  * ```
  *
- * @callback scanCallback
- * @param {functionCallback} controller Controller factory
+ * @callback ScanCallback
+ * @param {ControllerCallback} controller Controller factory
  * @param {string} name Route name
  * @returns {void}
  */
@@ -82,7 +83,7 @@ const Translator = require('./translator');
  * @property {string} prefix Path prefix
  * @property {express.Application} app Express app
  * @property {{[key: string]: ControllerRoute}} routes Routes
- * @property {preRouteCallback} preRoute Pre route callback
+ * @property {PreRouteCallback} preRoute Pre route callback
  */
 
 /**
@@ -324,7 +325,7 @@ class Controller {
      * @returns {string}
      */
     _(message, params = {}) {
-        return Translator._(message, params);
+        return _(message, params);
     }
 
     /**
@@ -440,7 +441,7 @@ class Controller {
      * Scan for controller in directory.
      *
      * @param {string} dir Controller directory
-     * @param {scanCallback} callback Callback
+     * @param {ScanCallback} callback Callback
      */
     static scan(dir, callback) {
         const files = fs.readdirSync(dir);
